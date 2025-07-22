@@ -5,6 +5,7 @@ import org.gradle.api.logging.*
 import java.util.*
 
 
+@Suppress("unused")
 abstract class LwjglExtension(
     private val dependencyFactory: DependencyFactory,
     private val dependencies: DependencyHandler,
@@ -14,50 +15,65 @@ abstract class LwjglExtension(
     var version: String = "3.3.6"
     private var _nativePlatforms: List<Platform>? = null
 
+    // Core
     val core = Module("core", artifact = "lwjgl")
+
+    // Khronos modules
+    val egl = Module("egl", hasNatives = false)
+    val ktx = Module("ktx", minVersion = "3.3.2-SNAPSHOT")
+    val opencl = Module("opencl", hasNatives = false)
+    val opengl = Module("opengl")
+    val opengles = Module("opengles")
+    val openxr = Module("openxr", minVersion = "3.3.1")
+    val vulkan = Module("vulkan")
+
+    // Display and Input
+    val glfw = Module("glfw")
+    // val sdl = Module("sdl") // SDL is not supported despite being listed in the LWJGL docs
+    val jawt = Module("jawt", hasNatives = false)
+    val nfd = Module("nfd")
+    val tinyfd = Module("tinyfd")
+
+    // Audio
+    val fmod = Module("fmod", hasNatives = false, minVersion = "3.3.2-SNAPSHOT")
+    val openal = Module("openal")
+    val opus = Module("opus", minVersion = "3.2.1")
+
+    // Graphics
     val assimp = Module("assimp", minVersion = "3.1.1")
     val bgfx = Module("bgfx")
-    val cuda = Module("cuda", hasNatives = false, minVersion = "3.2.1")
-    val egl = Module("egl", hasNatives = false)
-    val fmod = Module("fmod", hasNatives = false, minVersion = "3.3.2-SNAPSHOT")
     val freetype = Module("freetype", minVersion = "3.3.2-SNAPSHOT")
-    val glfw = Module("glfw")
     val harfbuzz = Module("harfbuzz", minVersion = "3.3.2-SNAPSHOT")
+    val meshoptimizer = Module("meshoptimizer", minVersion = "3.3.0")
+    val msdfgen = Module("msdfgen", minVersion = "3.3.4")
+    val nanovg = Module("nanovg")
+    val nuklear = Module("nuklear")
+    val par = Module("par")
+    val rpmalloc = Module("rpmalloc", minVersion = "3.1.3")
+    val shaderc = Module("shaderc", minVersion = "3.2.3")
+    val spvc = Module("spvc", minVersion = "3.3.0")
+    val tinyexr = Module("tinyexr", minVersion = "3.1.2")
+    val vma = Module("vma", minVersion = "3.2.0")
+    val yoga = Module("yoga", minVersion = "3.1.2")
+
+    // stb
+    val stb = Module("stb")
+
+    // other
+    val cuda = Module("cuda", hasNatives = false, minVersion = "3.2.1")
     val hwloc = Module("hwloc", minVersion = "3.3.2-SNAPSHOT")
-    val jawt = Module("jawt", hasNatives = false)
     val jemalloc = Module("jemalloc")
-    val ktx = Module("ktx", minVersion = "3.3.2-SNAPSHOT")
     val libdivide = Module("libdivide", minVersion = "3.2.1")
     val llvm = Module("llvm", minVersion = "3.2.1")
     val lmdb = Module("lmdb")
     val lz4 = Module("lz4", minVersion = "3.1.4")
     val meow = Module("meow", minVersion = "3.2.1")
-    val meshoptimizer = Module("meshoptimizer", minVersion = "3.3.0")
-    val nanovg = Module("nanovg")
-    val nfd = Module("nfd")
-    val nuklear = Module("nuklear")
     val odbc = Module("odbc", hasNatives = false, minVersion = "3.1.4")
-    val openal = Module("openal")
-    val opencl = Module("opencl", hasNatives = false)
-    val opengl = Module("opengl")
-    val opengles = Module("opengles")
     val openvr = Module("openvr", minVersion = "3.1.2")
-    val openxr = Module("openxr", minVersion = "3.3.1")
-    val opus = Module("opus", minVersion = "3.2.1")
-    val par = Module("par")
     val remotery = Module("remotery", minVersion = "3.1.4")
-    val rpmalloc = Module("rpmalloc", minVersion = "3.1.3")
-    val shaderc = Module("shaderc", minVersion = "3.2.3")
-    val spvc = Module("spvc", minVersion = "3.3.0")
     val sse = Module("sse")
-    val stb = Module("stb")
-    val tinyexr = Module("tinyexr", minVersion = "3.1.2")
-    val tinyfd = Module("tinyfd")
     val tootle = Module("tootle", minVersion = "3.1.5")
-    val vma = Module("vma", minVersion = "3.2.0")
-    val vulkan = Module("vulkan")
     val xxhash = Module("xxhash")
-    val yoga = Module("yoga", minVersion = "3.1.2")
     val zstd = Module("zstd", minVersion = "3.1.4")
 
     private val allModules = listOf(
