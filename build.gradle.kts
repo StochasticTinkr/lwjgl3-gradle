@@ -6,17 +6,27 @@ plugins {
 }
 
 group = "com.stochastictinkr.lwjgl"
-version = "1.0.0"
+version = "1.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+configurations.create("testAgent") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isVisible = false
 }
 
 dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
     testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
+    testImplementation("io.mockk:mockk:1.14.5")
+    "testAgent"("net.bytebuddy:byte-buddy-agent:1.15.11")
 }
+
 
 // Plugin development configuration
 gradlePlugin {
@@ -36,6 +46,7 @@ gradlePlugin {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${configurations.getByName("testAgent").asPath}")
 }
 
 kotlin {

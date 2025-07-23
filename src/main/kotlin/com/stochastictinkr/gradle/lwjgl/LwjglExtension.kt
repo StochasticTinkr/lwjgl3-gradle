@@ -6,11 +6,23 @@ import java.util.*
 
 
 @Suppress("unused")
-abstract class LwjglExtension(
+open class LwjglExtension internal constructor(
     private val dependencyFactory: DependencyFactory,
     private val dependencies: DependencyHandler,
     private val logger: Logger,
+    internal val platformDetector: PlatformDetector,
 ) {
+    constructor(
+        dependencyFactory: DependencyFactory,
+        dependencies: DependencyHandler,
+        logger: Logger,
+    ) : this(
+        dependencyFactory,
+        dependencies,
+        logger,
+        PlatformDetector()
+    )
+
     var group: String = "org.lwjgl"
     var version: String = "3.3.6"
     private var _nativePlatforms: List<Platform>? = null
@@ -29,6 +41,7 @@ abstract class LwjglExtension(
 
     // Display and Input
     val glfw = Module("glfw")
+
     // val sdl = Module("sdl") // SDL is not supported despite being listed in the LWJGL docs
     val jawt = Module("jawt", hasNatives = false)
     val nfd = Module("nfd")
@@ -94,7 +107,9 @@ abstract class LwjglExtension(
     var nativePlatforms: List<Platform>
         get() {
             if (_nativePlatforms == null) {
-                _nativePlatforms = listOf(runningPlatform)
+                val detected = runningPlatform
+                    ?: error("Unrecognized or unsupported Operating system. Please set `nativePlatforms` manually")
+                _nativePlatforms = listOf(detected)
             }
             return _nativePlatforms!!
         }
@@ -118,14 +133,14 @@ abstract class LwjglExtension(
         _nativePlatforms = allPlatforms
     }
 
-    val linuxArm64 = Platform("linux-arm64")
-    val linuxArm32 = Platform("linux-arm32")
-    val linux = Platform("linux")
-    val macosArm64 = Platform("macos-arm64")
-    val macos = Platform("macos")
-    val windowsArm64 = Platform("windows-arm64")
-    val windows = Platform("windows")
-    val windowsX86 = Platform("windows-x86")
+    val linuxArm64 = Platform.linuxArm64
+    val linuxArm32 = Platform.linuxArm32
+    val linux = Platform.linux
+    val macosArm64 = Platform.macosArm64
+    val macos = Platform.macos
+    val windowsArm64 = Platform.windowsArm64
+    val windows = Platform.windows
+    val windowsX86 = Platform.windowsX86
 
     val allPlatforms = listOf(
         linuxArm64,
@@ -175,29 +190,10 @@ abstract class LwjglExtension(
     }
 
     val runningPlatform by lazy {
-        val arch = System.getProperty("os.arch")
-        val isAarch64 = arch.startsWith("aarch64")
-        val osName = System.getProperty("os.name").lowercase(Locale.ROOT)
-        val isWindows = osName.contains("windows")
-        val isLinux = osName.contains("linux")
-        val isMacos = listOf("mac os", "macos", "darwin").any(osName::contains)
-        val isArch64 = "64" in arch
-        val isArm = arch.startsWith("arm") || isAarch64
-        val is64bitArmLinux = isArch64 || arch.startsWith("armv8")
-        when {
-            isWindows && isArch64 && !isAarch64 -> windows
-            isWindows && isArch64 -> windowsArm64
-            isWindows -> windowsX86
-
-            isLinux && isArm && is64bitArmLinux -> linuxArm64
-            isLinux && isArm -> linuxArm32
-            isLinux -> linux
-
-            isMacos && isAarch64 -> macosArm64
-            isMacos -> macos
-
-            else -> error("Unrecognized or unsupported Operating system. Please set `nativePlatforms` manually")
-        }
+        platformDetector.platformFrom(
+            System.getProperty("os.arch"),
+            System.getProperty("os.name").lowercase(Locale.ROOT)
+        )
     }
 
     internal val selectedModules: Set<Module>
@@ -293,21 +289,3 @@ abstract class LwjglExtension(
     }
 }
 
-data class Platform(val name: String)
-data class Module(
-    val name: String,
-    val hasNatives: Boolean = true,
-    val minVersion: String = "3.1.0",
-    val artifact: String = "lwjgl-$name",
-) {
-    // Override equals and hashCode to compare by name
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Module) return false
-        return name == other.name
-    }
-
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-}
