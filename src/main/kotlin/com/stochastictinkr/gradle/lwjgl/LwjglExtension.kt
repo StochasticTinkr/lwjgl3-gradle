@@ -1,4 +1,4 @@
-package com.stochastictinkr
+package com.stochastictinkr.gradle.lwjgl
 
 import org.gradle.api.artifacts.dsl.*
 import org.gradle.api.logging.*

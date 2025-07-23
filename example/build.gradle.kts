@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "2.1.21"
     id("com.stochastictinkr.lwjgl") version "1.0-SNAPSHOT"
 }
 
