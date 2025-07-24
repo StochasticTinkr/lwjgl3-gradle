@@ -42,7 +42,7 @@ open class LwjglExtension internal constructor(
     // Display and Input
     val glfw = Module("glfw")
 
-    // val sdl = Module("sdl") // SDL is not supported despite being listed in the LWJGL docs
+    // val sdl = Module("sdl") // SDL support is not yet released.
     val jawt = Module("jawt", hasNatives = false)
     val nfd = Module("nfd")
     val tinyfd = Module("tinyfd")
@@ -62,12 +62,16 @@ open class LwjglExtension internal constructor(
     val nanovg = Module("nanovg")
     val nuklear = Module("nuklear")
     val par = Module("par")
-    val rpmalloc = Module("rpmalloc", minVersion = "3.1.3")
     val shaderc = Module("shaderc", minVersion = "3.2.3")
     val spvc = Module("spvc", minVersion = "3.3.0")
     val tinyexr = Module("tinyexr", minVersion = "3.1.2")
+    val tootle = Module("tootle", minVersion = "3.1.5")
     val vma = Module("vma", minVersion = "3.2.0")
     val yoga = Module("yoga", minVersion = "3.1.2")
+
+    // AR/VR
+    val openvr = Module("openvr", minVersion = "3.1.2")
+    val ovr = Module("ovr", minVersion = "3.1.2")
 
     // stb
     val stb = Module("stb")
@@ -82,11 +86,10 @@ open class LwjglExtension internal constructor(
     val lz4 = Module("lz4", minVersion = "3.1.4")
     val meow = Module("meow", minVersion = "3.2.1")
     val odbc = Module("odbc", hasNatives = false, minVersion = "3.1.4")
-    val openvr = Module("openvr", minVersion = "3.1.2")
     val remotery = Module("remotery", minVersion = "3.1.4")
-    val sse = Module("sse")
-    val tootle = Module("tootle", minVersion = "3.1.5")
+    val rpmalloc = Module("rpmalloc", minVersion = "3.1.3")
     val xxhash = Module("xxhash")
+    val sse = Module("sse")
     val zstd = Module("zstd", minVersion = "3.1.4")
 
     private val allModules = listOf(
