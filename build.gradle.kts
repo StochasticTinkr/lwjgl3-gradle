@@ -12,11 +12,7 @@ repositories {
     mavenCentral()
 }
 
-configurations.create("testAgent") {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-    isVisible = false
-}
+val testAgent: Configuration by configurations.creating
 
 dependencies {
     implementation(gradleApi())
@@ -24,7 +20,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
     testImplementation("io.mockk:mockk:1.14.5")
-    "testAgent"("net.bytebuddy:byte-buddy-agent:1.15.11")
+    testAgent("net.bytebuddy:byte-buddy-agent:1.15.11")
 }
 
 
@@ -46,11 +42,7 @@ gradlePlugin {
 
 tasks.test {
     useJUnitPlatform()
-    jvmArgs("-javaagent:${configurations.getByName("testAgent").asPath}")
-}
-
-kotlin {
-    jvmToolchain(21)
+    jvmArgs("-javaagent:${testAgent.asPath}")
 }
 
 publishing {
