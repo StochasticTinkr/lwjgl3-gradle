@@ -78,6 +78,7 @@ class LwjglExtensionTest {
         return createdDependencies
     }
 
+    @Test
     fun `warn when the version is lower than the minimum required version`() {
         extension.run {
             version = "3.1.0"
