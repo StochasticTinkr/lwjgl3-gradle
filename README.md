@@ -21,7 +21,7 @@ To use this plugin, add the following to your `build.gradle.kts` file:
 
 ```kotlin
 plugins {
-    id("com.stochastictinkr.lwjgl") version "1.0.0"
+    id("com.stochastictinkr.lwjgl") version "1.0.1"
 }
 ```
 
