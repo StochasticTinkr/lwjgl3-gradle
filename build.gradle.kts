@@ -44,13 +44,3 @@ tasks.test {
     useJUnitPlatform()
     jvmArgs("-javaagent:${testAgent.asPath}")
 }
-
-publishing {
-    repositories {
-        maven {
-            // Used for testing with the `example` project.
-            name = "localBuildRepo"
-            url = uri("${layout.buildDirectory.get().asFile.path}/repo")
-        }
-    }
-}
