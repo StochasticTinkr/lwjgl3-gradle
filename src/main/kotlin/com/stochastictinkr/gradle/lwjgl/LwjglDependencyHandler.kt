@@ -1,5 +1,7 @@
 package com.stochastictinkr.gradle.lwjgl
 
+import org.gradle.api.provider.*
+
 sealed interface LwjglDependencyHandler {
     /**
      * The Maven group for LWJGL artifacts.
@@ -21,11 +23,25 @@ sealed interface LwjglDependencyHandler {
      */
     var runtimeConfiguration: String
 
-
     /**
      * The set of LWJGL module dependencies explicitly requested. Does not include modules added by presets.
      */
     var modules: MutableSet<Module>
+
+    /**
+     * Sets the LWJGL version to use.
+     */
+    fun version(provider: ProviderConvertible<String>) = version(provider.asProvider())
+
+    /**
+     * Sets the LWJGL version to use.
+     */
+    fun version(version: String)
+
+    /**
+     * Sets the LWJGL version to use.
+     */
+    fun version(version: Provider<String>)
 
     /**
      * Sets the native platforms to use for runtime dependencies.

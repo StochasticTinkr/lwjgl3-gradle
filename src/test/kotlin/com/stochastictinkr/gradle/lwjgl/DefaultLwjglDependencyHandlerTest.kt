@@ -1,16 +1,19 @@
 package com.stochastictinkr.gradle.lwjgl
 
 import io.mockk.*
+import org.gradle.api.*
 import org.gradle.api.artifacts.*
 import org.gradle.api.artifacts.dsl.*
 import org.gradle.api.logging.*
 import kotlin.test.*
 
 internal class DefaultLwjglDependencyHandlerTest {
-    val dependencyFactory = mockk<DependencyFactory>()
-    val dependencies = mockk<DependencyHandler>()
-    val logger = mockk<Logger>()
     val handler = DefaultLwjglDependencyHandler()
+    val project = mockk<Project> {
+        every { dependencyFactory } returns mockk()
+        every { logger } returns mockk<Logger>()
+        every { dependencies } returns mockk<DependencyHandler>()
+    }
 
     // Simulate the gradle DSL extension
     private fun lwjgl(block: LwjglExtension.() -> Unit) {
@@ -31,7 +34,7 @@ internal class DefaultLwjglDependencyHandlerTest {
         val createdDependencies = captureCreatedDependencies()
         captureConfigurations()
 
-        handler.addDependencies(dependencyFactory, logger, dependencies)
+        project.addLwjglDependencies(handler)
 
         // Getting started has:
         // core, assimp, bgfx, glfw, nanovg, nuklear, openal, opengl, par, stb, vulkan
@@ -61,18 +64,18 @@ internal class DefaultLwjglDependencyHandlerTest {
             modules(assimp)
         }
 
-        every { logger.warnMinVersion(Modules.assimp, "3.1.0") } just Runs
+        every { project.logger.warnMinVersion(Modules.assimp, "3.1.0") } just Runs
 
         val createdDependencies = captureCreatedDependencies()
         captureConfigurations()
 
-        handler.addDependencies(dependencyFactory, logger, dependencies)
+        project.addLwjglDependencies(handler)
         // Verify that the dependency was created with the correct version:
         assertEquals("3.1.0", createdDependencies.first { it.name == "lwjgl-assimp" }.version)
 
         // Verify that the warning was logged:
-        verifyAll {
-            logger.warnMinVersion(Modules.assimp, "3.1.0")
+        verify {
+            project.logger.warnMinVersion(Modules.assimp, "3.1.0")
         }
     }
 
@@ -82,19 +85,19 @@ internal class DefaultLwjglDependencyHandlerTest {
             version = "3.3.6"
         }
 
-        every { logger.warnNoModules() } just Runs
+        every { project.logger.warnNoModules() } just Runs
 
         val createdDependencies = captureCreatedDependencies()
         captureConfigurations()
 
-        handler.addDependencies(dependencyFactory, logger, dependencies)
+        project.addLwjglDependencies(handler)
 
         // Verify that no dependencies were created:
         assertTrue(createdDependencies.isEmpty())
 
         // Verify that the warning was logged:
         verifyAll {
-            logger.warnNoModules()
+            project.logger.warnNoModules()
         }
     }
 
@@ -109,7 +112,7 @@ internal class DefaultLwjglDependencyHandlerTest {
     private fun captureCreatedDependencies(): List<CreatedDependency> {
         val createdDependencies = mutableListOf<CreatedDependency>()
 
-        every { dependencyFactory.create(any(), any(), any(), any(), any()) } answers {
+        every { project.dependencyFactory.create(any(), any(), any(), any(), any()) } answers {
             val (group, name, version, classifier) = it.invocation.args
 
             CreatedDependency(
@@ -124,12 +127,12 @@ internal class DefaultLwjglDependencyHandlerTest {
 
     private fun captureConfigurations(
         implementationConfiguration: String = "implementation",
-        runtimeConfiguration: String = "runtimeOnly"
+        runtimeConfiguration: String = "runtimeOnly",
     ): Pair<List<ExternalModuleDependency>, List<ExternalModuleDependency>> {
         val addedToImplementation = mutableListOf<ExternalModuleDependency>()
         val addedToRuntimeOnly = mutableListOf<ExternalModuleDependency>()
-        every { dependencies.add(implementationConfiguration, capture(addedToImplementation)) } returnsArgument 1
-        every { dependencies.add(runtimeConfiguration, capture(addedToRuntimeOnly)) } returnsArgument 1
+        every { project.dependencies.add(implementationConfiguration, capture(addedToImplementation)) } returnsArgument 1
+        every { project.dependencies.add(runtimeConfiguration, capture(addedToRuntimeOnly)) } returnsArgument 1
         return addedToImplementation to addedToRuntimeOnly
     }
 }

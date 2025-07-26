@@ -1,14 +1,22 @@
 package com.stochastictinkr.gradle.lwjgl
 
+import org.gradle.api.*
 import org.gradle.api.artifacts.*
 import org.gradle.api.artifacts.dsl.*
 import org.gradle.api.logging.*
+import org.gradle.api.provider.*
 
 internal class DefaultLwjglDependencyHandler : LwjglDependencyHandler {
-
     override var group: String = "org.lwjgl"
 
     override var version: String = "3.3.6"
+        get() = versionProvider?.get() ?: field
+        set(value) {
+            field = value
+            versionProvider = null
+        }
+
+    private var versionProvider: Provider<String>? = null
 
     override var implementationConfiguration: String = "implementation"
 
@@ -17,6 +25,14 @@ internal class DefaultLwjglDependencyHandler : LwjglDependencyHandler {
     private var nativePlatforms: List<Platform>? = null
 
     override var modules: MutableSet<Module> = mutableSetOf()
+
+    override fun version(version: String) {
+        this.version = version
+    }
+
+    override fun version(version: Provider<String>) {
+        this.versionProvider = version
+    }
 
     override fun nativePlatforms(vararg platforms: Platform) {
         nativePlatforms = platforms.toList()
@@ -44,15 +60,14 @@ internal class DefaultLwjglDependencyHandler : LwjglDependencyHandler {
         this.modules.addAll(modules)
     }
 
-    internal fun addDependencies(
-        dependencyFactory: DependencyFactory,
-        logger: Logger,
-        dependencies: DependencyHandler,
-    ) {
+    internal fun Project.addDependencies() {
         if (modules.isEmpty() && defaultPresets.isEmpty) {
             logger.warnNoModules()
             return
         }
+        val version = this@DefaultLwjglDependencyHandler.version
+        val group = this@DefaultLwjglDependencyHandler.group
+
         val selectedModules = setOf(Modules.core) + defaultPresets.forVersion(version) + modules
         selectedModules.forEach {
             if (!VersionUtils.meetsVersionRequirement(
@@ -64,39 +79,43 @@ internal class DefaultLwjglDependencyHandler : LwjglDependencyHandler {
             }
         }
 
-        val implementationDependencies = selectedModules.map { module ->
-            dependencyFactory.create(
-                /* group = */ group,
-                /* name = */ module.artifact,
-                /* version = */ version,
-                /* classifier = */ null,
-                /* extension = */ null,
-            )
-        }
+        val implementationDependencies =
+            selectedModules.map { module ->
+                createDependency(group, module.artifact, version)
+            }
 
         val nativePlatforms = nativePlatforms ?: run {
             Platforms.runningPlatform?.let(::listOf)
                 ?: error("Unrecognized or unsupported Operating system. Please set `nativePlatforms` manually")
         }
 
-        val runtimeOnlyDependencies = selectedModules.filter { it.hasNatives }
-            .flatMap { module ->
-                nativePlatforms.map { platform ->
-                    dependencyFactory.create(
-                        /* group = */ group,
-                        /* name = */ module.artifact,
-                        /* version = */ version,
-                        /* classifier = */ "natives-${platform.name}",
-                        /* extension = */ null,
-                    )
+        val platformClassifiers = nativePlatforms.map { "natives-${it.name}" }
+
+        val runtimeOnlyDependencies =
+            selectedModules.filter { it.hasNatives }
+                .flatMap { module ->
+                    platformClassifiers.map { classifier ->
+                        createDependency(group, module.artifact, version, classifier)
+                    }
                 }
-            }
 
         dependencies.addAll(implementationConfiguration, implementationDependencies)
         dependencies.addAll(runtimeConfiguration, runtimeOnlyDependencies)
     }
-
 }
+
+private fun Project.createDependency(
+    group: String,
+    name: String,
+    version: String,
+    classifier: String? = null,
+) = dependencyFactory.create(
+    /* group = */ group,
+    /* name = */ name,
+    /* version = */ version,
+    /* classifier = */ classifier,
+    /* extension = */ null,
+)
 
 internal fun Logger.warnMinVersion(
     module: Module,
@@ -111,6 +130,6 @@ internal fun Logger.warnNoModules() = warn(
 
 private fun DependencyHandler.addAll(
     configurationName: String,
-    dependencies: Collection<ExternalModuleDependency>,
+    dependencies: Iterable<ExternalModuleDependency>,
 ) = dependencies.forEach { add(configurationName, it) }
 
