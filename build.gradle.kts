@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.stochastictinkr.lwjgl"
-version = "1.0.1"
+version = "1.0.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
