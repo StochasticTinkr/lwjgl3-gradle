@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.21"
     id("com.stochastictinkr.lwjgl") version "1.0.1-SNAPSHOT"
+    application
 }
 
 group = "com.stochastictinkr"
@@ -17,7 +18,9 @@ dependencies {
         modules(glfw)
     }
 }
-
+application {
+    mainClass.set("com.stochastictinkr.lwjgl.example.ShowWindowKt")
+}
 tasks.test {
     useJUnitPlatform()
 }

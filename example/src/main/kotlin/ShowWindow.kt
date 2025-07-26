@@ -1,3 +1,5 @@
+package com.stochastictinkr.lwjgl.example
+
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.system.*
 

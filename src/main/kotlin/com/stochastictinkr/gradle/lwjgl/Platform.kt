@@ -1,14 +1,10 @@
 package com.stochastictinkr.gradle.lwjgl
 
-data class Platform(val name: String) {
-    companion object {
-        val linuxArm64 = Platform("linux-arm64")
-        val linuxArm32 = Platform("linux-arm32")
-        val linux = Platform("linux")
-        val macosArm64 = Platform("macos-arm64")
-        val macos = Platform("macos")
-        val windowsArm64 = Platform("windows-arm64")
-        val windows = Platform("windows")
-        val windowsX86 = Platform("windows-x86")
-    }
-}
+/**
+ * Represents a platform for LWJGL dependencies. The name is the identifier used in the classifier of the dependency
+ * coordinates for the native libraries.
+ *
+ * For example, the platform `linux-arm64` will have the classifier `natives-linux-arm64` in the dependency coordinates.
+ */
+data class Platform(val name: String)
+

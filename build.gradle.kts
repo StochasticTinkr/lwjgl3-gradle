@@ -1,4 +1,5 @@
 plugins {
+    @Suppress("UnstableApiUsage")
     embeddedKotlin("jvm")
     `kotlin-dsl`
     id("com.gradle.plugin-publish") version "1.2.2"
