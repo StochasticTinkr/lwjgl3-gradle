@@ -1,5 +1,6 @@
 package com.stochastictinkr.gradle.lwjgl
 
+import org.gradle.internal.os.OperatingSystem
 import kotlin.test.*
 
 internal class PlatformDetectorTest {
@@ -7,7 +8,7 @@ internal class PlatformDetectorTest {
 
     private fun assertPlatformFrom(expected: Platform?, osName: String, osArch: String) {
         assertEquals(expected, platformDetector.platformFrom(osArch, osName),
-            "Expected platformFrom to return $expected for osName=$osName and osArch=$osArch")
+            "Expected platformFrom to return $expected for osName=$osName and osArch=$osArch. ")
     }
 
     @Test
@@ -27,22 +28,22 @@ internal class PlatformDetectorTest {
 
     @Test
     fun `platformFrom on macos-arm64`() {
-        assertPlatformFrom(Platforms.macosArm64, "mac os", "aarch64")
+        assertPlatformFrom(Platforms.macosArm64, "mac os x", "aarch64")
     }
 
     @Test
     fun `platformFrom on macos`() {
-        assertPlatformFrom(Platforms.macos, "macos", "x86_64")
+        assertPlatformFrom(Platforms.macos, "mac os x", "x86_64")
     }
 
     @Test
     fun `platformFrom on windows-arm64`() {
-        assertPlatformFrom(Platforms.windowsArm64, "windows", "Arm64")
+        assertPlatformFrom(Platforms.windows, "windows", "arm64")
     }
 
     @Test
     fun `platformFrom on windows`() {
-        assertPlatformFrom(Platforms.windows, "windows", "aarch64")
+        assertPlatformFrom(Platforms.windowsArm64, "windows", "aarch64")
     }
 
     @Test
@@ -54,5 +55,4 @@ internal class PlatformDetectorTest {
     fun `platformFrom on unknown platform`() {
         assertPlatformFrom(null, "unknown", "unknown")
     }
-
 }

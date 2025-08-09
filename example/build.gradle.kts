@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.1.21"
-    id("com.stochastictinkr.lwjgl") version "1.0.2"
+    id("com.stochastictinkr.lwjgl") version "1.0.3"
     application
 }
 

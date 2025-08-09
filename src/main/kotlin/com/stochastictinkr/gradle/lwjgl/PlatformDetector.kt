@@ -9,7 +9,7 @@ internal class PlatformDetector {
         val isArch64 = "64" in arch
         val isArm = arch.startsWith("arm") || isAarch64
         return when {
-            isWindows && isArch64 && !isAarch64 -> Platforms.windowsArm64
+            isWindows && isArch64 && isAarch64 -> Platforms.windowsArm64
             isWindows && isArch64 -> Platforms.windows
             isWindows -> Platforms.windowsX86
 
